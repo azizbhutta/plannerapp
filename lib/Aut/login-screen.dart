@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plannerapp/Aut/signup-screen.dart';
 import 'package:plannerapp/Screen/home-screen.dart';
 import '../constants/colors.dart';
 import '../constants/image-strings.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 
@@ -21,7 +23,8 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  // FirebaseAuth auth = FirebaseAuth.instance;
+
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void dispose() {
@@ -30,31 +33,31 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // void login() {
-  //   setState(() {
-  //     loading = true;
-  //   });
-  //   auth
-  //       .signInWithEmailAndPassword(
-  //       email: emailController.text,
-  //       password: passwordController.text.toString())
-  //       .then((value) {
-  //     Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: value.user!.email.toString());
-  //     Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //             builder: (context) => const HomePage()));
-  //     setState(() {
-  //       loading = false;
-  //     });
-  //   }).onError((error, stackTrace) {
-  //     debugPrint(error.toString());
-  //     Fluttertoast.showToast(gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg:error.toString());
-  //     setState(() {
-  //       loading = false;
-  //     });
-  //   });
-  // }
+  void login() {
+    setState(() {
+      loading = true;
+    });
+    auth
+        .signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text.toString())
+        .then((value) {
+      Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: value.user!.email.toString());
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const HomeScreen()));
+      setState(() {
+        loading = false;
+      });
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      Fluttertoast.showToast(gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg:error.toString());
+      setState(() {
+        loading = false;
+      });
+    });
+  }
 
 
 
@@ -144,12 +147,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                           labelText: "Email",
                                           labelStyle: TextStyle(color: tDorkColor),
                                         ),
-                                        // validator: (value){
-                                        //   if(value!.isEmpty){
-                                        //     Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your email");
-                                        //   }
-                                        //   return null ;
-                                        // },
+                                        validator: (value){
+                                          if(value!.isEmpty){
+                                            Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your email");
+                                          }
+                                          return null ;
+                                        },
                                       ),
                                     ),
                                   ),
@@ -184,12 +187,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                           hintText: '*********',
                                           labelStyle: TextStyle(color: tDorkColor),
                                         ),
-                                        // validator: (value) {
-                                        //   if (value!.isEmpty && value!.length < 5) {
-                                        //     Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
-                                        //   }
-                                        //   return null;
-                                        // },
+                                        validator: (value) {
+                                          if (value!.isEmpty && value!.length < 5) {
+                                            Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
+                                          }
+                                          return null;
+                                        },
                                       ),
                                     ),
                                   ),
@@ -218,10 +221,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         onPressed: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
-                          // loading = loading;
-                          // if(_formKey.currentState!.validate()){
-                          //   login();
-                          // }
+                          loading = loading;
+                          if(_formKey.currentState!.validate()){
+                            login();
+                          }
                         },
                         child: const Text(
                           'Log in!',

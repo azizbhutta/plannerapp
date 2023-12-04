@@ -1,4 +1,5 @@
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -24,7 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  // FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
 
   @override
@@ -48,21 +49,21 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void signup(){
-    // setState(() {
-    //   loading = true;
-    // });
-    // _auth.createUserWithEmailAndPassword(
-    //     email: emailController.text.toString(),
-    //     password: passwordController.text.toString()).then((value) {
-    //   setState(() {
-    //     loading = false;
-    //   });
-    // }).onError((error, stackTrace){
-    //   Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: error.toString());
-    // });
-    // setState(() {
-    //   loading = false;
-    // });
+    setState(() {
+      loading = true;
+    });
+    _auth.createUserWithEmailAndPassword(
+        email: emailController.text.toString(),
+        password: passwordController.text.toString()).then((value) {
+      setState(() {
+        loading = false;
+      });
+    }).onError((error, stackTrace){
+      Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: error.toString());
+    });
+    setState(() {
+      loading = false;
+    });
   }
   // TODO PICK IMAGE
 
@@ -315,11 +316,10 @@ class _SignupScreenState extends State<SignupScreen> {
                             vertical: 10)
                     ),
                     onPressed: () {
-                      // Navigator.push(context, MaterialPageRoute(builder: (context)=> const SignupScreenSecond()));
-                      // if(_formKey.currentState!.validate()){
-                      //   validate();
-                      //   signup();
-                      // }
+                      if(_formKey.currentState!.validate()){
+                        validate();
+                        signup();
+                      }
                     },
                     child: loading ? const CircularProgressIndicator(strokeWidth: 3,color: Colors.white,):
                     const Text(
