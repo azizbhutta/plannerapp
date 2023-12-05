@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           filled: true,
                                           fillColor: Colors.white,
-                                          labelText: "Email",
+                                          hintText: "Email",
                                           labelStyle: TextStyle(color: tDorkColor),
                                         ),
                                         validator: (value){
@@ -183,8 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           filled: true,
                                           fillColor: Colors.white,
-                                          labelText: "Password",
-                                          hintText: '*********',
+                                          hintText: "Password",
                                           labelStyle: TextStyle(color: tDorkColor),
                                         ),
                                         validator: (value) {
@@ -220,7 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 vertical: 10)
                         ),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> HomeScreen()));
                           loading = loading;
                           if(_formKey.currentState!.validate()){
                             login();
@@ -265,3 +263,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+

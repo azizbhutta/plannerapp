@@ -1,13 +1,16 @@
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import '../constants/colors.dart';
 import '../constants/image-strings.dart';
 import 'login-screen.dart';
+
 
 
 class SignupScreen extends StatefulWidget {
@@ -19,13 +22,22 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
 
+
+  File? selectedImage; // Track the selected image file
+  DateTime? selectedDate;
+
   bool loading = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+
+
+  // TODO: Add Firestore instance
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 
   @override
@@ -33,51 +45,117 @@ class _SignupScreenState extends State<SignupScreen> {
     nameController.clear();
     emailController.clear();
     passwordController.clear();
+    dobController.clear();
     super.dispose();
   }
 
 
-  void validate(){
-    if (_formKey.currentState!.validate()){
+  void validate() {
+    if (_formKey.currentState!.validate()) {
+      // If the form is valid, proceed with navigation
       Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => const LoginScreen()));
-    }else{
+          MaterialPageRoute(builder: (context) => const LoginScreen()));
+    } else {
+      // If the form is not valid, show error messages or toasts
       return;
     }
   }
 
-  void signup(){
+
+  // TODO: Add a function to show date picker
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+      });
+    }
+  }
+
+
+// TODO: signup method to store DatA in Firestore
+  Future<void> signup() async {
     setState(() {
       loading = true;
     });
-    _auth.createUserWithEmailAndPassword(
+
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: emailController.text.toString(),
-        password: passwordController.text.toString()).then((value) {
+        password: passwordController.text.toString(),
+      );
+
+      // Upload profile image to Firebase Storage
+      String userId = userCredential.user!.uid;
+      Reference storageReference = FirebaseStorage.instance.ref().child('profile_images/$userId.jpg');
+      UploadTask uploadTask = storageReference.putFile(selectedImage!);
+      await uploadTask.whenComplete(() async {
+        // Get the download URL of the uploaded image
+        String imageUrl = await storageReference.getDownloadURL();
+
+        // Store user information in Cloud Firestore
+        await _firestore.collection('users').doc(userId).set({
+          'name': nameController.text,
+          'email': emailController.text,
+          'dob': dobController.text,
+          'profileImageUrl': imageUrl,
+        });
+
+        // Update user profile with image URL
+        await userCredential.user!.updateProfile(displayName: nameController.text, photoURL: imageUrl);
+
+        setState(() {
+          loading = false;
+        });
+
+        Fluttertoast.showToast(
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.green,
+          msg: "Signup complete",
+        );
+
+        // Navigate to login screen only if user creation is successful
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ),
+        );
+      });
+    } catch (error) {
       setState(() {
         loading = false;
       });
-    }).onError((error, stackTrace){
-      Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: error.toString());
-    });
-    setState(() {
-      loading = false;
-    });
-  }
-  // TODO PICK IMAGE
 
+      Fluttertoast.showToast(
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.purple,
+        msg: error.toString(),
+      );
+    }
+  }
+
+  // TODO: Pick Image
   Future<void> openGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      // You can use the pickedFile for further processing here.
-      if (kDebugMode) {
-        print(pickedFile.path);
-      }
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
     }
   }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,7 +233,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                       filled: true,
                                       fillColor: Colors.white,
-                                      labelText: "User Name",
+                                      hintText: 'User Name',
                                       labelStyle: TextStyle(color: tDorkColor),
                                     ),
                                     validator: (value){
@@ -192,7 +270,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                       filled: true,
                                       fillColor: Colors.white,
-                                      labelText: "Email",
+                                      hintText: "Email",
                                       labelStyle: TextStyle(color: tDorkColor),
                                     ),
                                     validator: (value){
@@ -230,7 +308,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                       filled: true,
                                       fillColor: Colors.white,
-                                      labelText: "Password",
+                                      hintText: "Password",
                                       labelStyle: TextStyle(color: tDorkColor),
                                     ),
                                     validator: (value) {
@@ -247,10 +325,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                 child: SizedBox(
                                   height: 50,
                                   child: TextFormField(
-                                    controller: passwordController,
+                                    controller: dobController,
                                     keyboardType: TextInputType.text,
                                     textInputAction: TextInputAction.done,
                                     cursorColor: tDorkColor,
+                                    onTap: () => _selectDate(context),
                                     decoration: const InputDecoration(
                                       focusedBorder: UnderlineInputBorder(
                                           borderSide: BorderSide.none,
@@ -261,12 +340,12 @@ class _SignupScreenState extends State<SignupScreen> {
                                           borderRadius:
                                           BorderRadius.all(Radius.circular(10))),
                                       prefixIcon: Icon(
-                                        Icons.lock,
+                                        Icons.calendar_month,
                                         color: secondaryColor,
                                       ),
                                       filled: true,
                                       fillColor: Colors.white,
-                                      labelText: "DOB",
+                                      hintText: "DOB",
                                       labelStyle: TextStyle(color: tDorkColor),
                                     ),
                                     validator: (value) {
@@ -279,21 +358,42 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ),
                               ),
 
-                               Row(
-                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              //  Row(
+                              //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              //   children: [
+                              //     const Text('Profile Image',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w900),),
+                              //     IconButton(onPressed: openGallery,
+                              //         icon: Container(
+                              //             height:35,
+                              //             width:35,
+                              //             decoration: BoxDecoration(
+                              //               borderRadius: BorderRadius.circular(50),
+                              //               color: Colors.white
+                              //             ),
+                              //             child: const Icon(Icons.camera_alt_outlined,color: Colors.black,)),)
+                              //   ],
+                              // ),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  const Text('Profile Image',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w900),),
-                                  IconButton(onPressed: openGallery,
-                                      icon: Container(
-                                          height:35,
-                                          width:35,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(50),
-                                            color: Colors.white
-                                          ),
-                                          child: const Icon(Icons.camera_alt_outlined,color: Colors.black,)),)
+                                  const Text('Profile Image', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                                  IconButton(
+                                    onPressed: openGallery,
+                                    icon: Container(
+                                      height: 35,
+                                      width: 35,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(50),
+                                        color: Colors.white,
+                                      ),
+                                      child: const Icon(Icons.camera_alt_outlined, color: Colors.black),
+                                    ),
+                                  )
                                 ],
-                              )
+                              ),
+
+
                             ],
                           )),
                       const SizedBox(
@@ -315,12 +415,26 @@ class _SignupScreenState extends State<SignupScreen> {
                             horizontal: MediaQuery.of(context).size.width / 3.3,
                             vertical: 10)
                     ),
+
                     onPressed: () {
-                      if(_formKey.currentState!.validate()){
-                        validate();
-                        signup();
+                      if (_formKey.currentState!.validate()) {
+                        // Validate the form
+                        if (selectedImage != null) {
+                          // Image is selected, proceed with signup
+                          signup();
+                        } else {
+                          Fluttertoast.showToast(backgroundColor: Colors.purple, msg: "Please select a profile image");
+                        }
                       }
                     },
+
+
+                    // onPressed: () {
+                    //   if(_formKey.currentState!.validate()){
+                    //     // validate();
+                    //     signup();
+                    //   }
+                    // },
                     child: loading ? const CircularProgressIndicator(strokeWidth: 3,color: Colors.white,):
                     const Text(
                       'Sign Up',
@@ -360,3 +474,6 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 }
+
+
+
