@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plannerapp/Aut/signup-screen.dart';
 import 'package:plannerapp/Screen/home-screen.dart';
+import '../Screen/new-screen.dart';
 import '../constants/colors.dart';
 import '../constants/image-strings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) =>  HomeScreen()));
+              builder: (context) =>  TaskListScreen()));
       setState(() {
         loading = false;
       });
