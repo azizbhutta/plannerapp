@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:plannerapp/Screen/profile-screen.dart';
 import '../Aut/firebase-service.dart';
 import '../Aut/login-screen.dart';
 import '../model/task-model.dart';
@@ -117,11 +118,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
           actions: [
             IconButton(
               onPressed: () {
-                // Navigator.pushReplacement(context,
-                //     MaterialPageRoute(builder: (context) => const ProductFire()));
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) =>  ProfileScreen()));
               },
               icon: const Icon(
-                Icons.add,
+                Icons.person_rounded,
                 color: Colors.white,
               ),
             ),
