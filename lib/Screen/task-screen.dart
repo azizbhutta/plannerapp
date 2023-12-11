@@ -81,7 +81,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                await _firebaseService.updateTask(task.id!, _editTitleController.text, _editDateTime!);
+                await _firebaseService.updateTask(task.id!, _editTitleController.text, DateTime.now());
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('Update'),
@@ -100,16 +100,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        // return true;
-        SystemNavigator.pop();
-        return false;
+        // Always return false to prevent going back
+        return Future.value(false);
       },
       child: Scaffold(
-        // appBar: AppBar(
-        //   automaticallyImplyLeading: false,
-        //   title: Center(child: const Text('Planner')),
-        // ),
-
         appBar: AppBar(
           centerTitle: true,
           title: const Text('Planner',
@@ -142,7 +136,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                           child :const Text('Yes'),
                           onPressed: () {
                             _auth.signOut().then((value) {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => const LoginScreen()));
@@ -157,11 +151,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                 fontSize: 14,
                               )
                           ),
-
                         ),
                         TextButton(
                           child :const Text('No'),
-                          onPressed: () => Navigator.push(
+                          onPressed: () => Navigator.pop(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>  TaskListScreen())),
@@ -178,7 +171,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   }
               );
             },
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout,color: Colors.white,),
           ),
         ),
         body: Column(
@@ -215,7 +208,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_titleController.text.isNotEmpty) {
-                        await _firebaseService.addTask(_titleController.text, _selectedDateTime);
+                        await _firebaseService.addTask(_titleController.text, DateTime.now());
                         _titleController.clear();
                       }
                     },
@@ -233,7 +226,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                       child: Text('Error: ${snapshot.error}'),
                     );
                   }
-
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(),
@@ -253,9 +245,10 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         title: Text(task.title ?? 'No Title'),
                         subtitle: Text(
                           task.dateTime != null
-                              ? DateFormat('yyyy-MM-dd HH:mm').format(task.dateTime!)
+                              ? DateFormat('yyyy-MM-dd hh:mm a').format(task.dateTime!.toLocal())
                               : 'No Date',
                         ),
+
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

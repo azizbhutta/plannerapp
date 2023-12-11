@@ -158,315 +158,321 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        color: primaryColor,
-        child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // logo here
-                const Image(image: AssetImage(signUpImage),
-                  height: 100,
-                  width: 100,
-                ),
-                Text(
-                  'Sign Up',
-                  style: GoogleFonts.indieFlower(
-                    textStyle: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 40,
+    return WillPopScope(
+        onWillPop: () async {
+          // Always return false to prevent going back
+          return Future.value(false);
+        },
+      child: Scaffold(
+        body: Container(
+          color: primaryColor,
+          child: Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // logo here
+                  const Image(image: AssetImage(signUpImage),
+                    height: 100,
+                    width: 100,
+                  ),
+                  Text(
+                    'Sign Up',
+                    style: GoogleFonts.indieFlower(
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  'Please signup to continue using our app',
-                  style: GoogleFonts.indieFlower(
-                    textStyle: TextStyle(
-                        color: Colors.black.withOpacity(0.5),
-                        fontWeight: FontWeight.w300,
-                        // height: 1.5,
-                        fontSize: 15),
+                  Text(
+                    'Please signup to continue using our app',
+                    style: GoogleFonts.indieFlower(
+                      textStyle: TextStyle(
+                          color: Colors.black.withOpacity(0.5),
+                          fontWeight: FontWeight.w300,
+                          // height: 1.5,
+                          fontSize: 15),
+                    ),
                   ),
-                ),
 
-                const SizedBox(
-                  height: 30,
-                ),
-                Container(
-                  height: 320,
-                  width: MediaQuery.of(context).size.width / 1.1,
-                  decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: Column(
-                    children: [
-                      Form(
-                          key: _formKey,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, bottom: 2, top: 20),
-                                child: SizedBox(
-                                  height: 50,
-                                  child: TextFormField(
-                                    controller: nameController,
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.next,
-                                    cursorColor: tDorkColor,
-                                    decoration: const InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      prefixIcon: Icon(
-                                        Icons.person,
-                                        color: secondaryColor,
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Container(
+                    height: 320,
+                    width: MediaQuery.of(context).size.width / 1.1,
+                    decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Column(
+                      children: [
+                        Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 2, top: 20),
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: TextFormField(
+                                      controller: nameController,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.next,
+                                      cursorColor: tDorkColor,
+                                      decoration: const InputDecoration(
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        prefixIcon: Icon(
+                                          Icons.person,
+                                          color: secondaryColor,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: 'User Name',
+                                        labelStyle: TextStyle(color: tDorkColor),
                                       ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      hintText: 'User Name',
-                                      labelStyle: TextStyle(color: tDorkColor),
+                                      validator: (value){
+                                        if(value!.isEmpty){
+                                          Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your name");
+                                        }
+                                        return null ;
+                                      },
                                     ),
-                                    validator: (value){
-                                      if(value!.isEmpty){
-                                        Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your name");
-                                      }
-                                      return null ;
-                                    },
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, bottom: 2, top: 10),
-                                child: SizedBox(
-                                  height: 50,
-                                  child: TextFormField(
-                                    controller: emailController,
-                                    keyboardType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.next,
-                                    cursorColor: tDorkColor,
-                                    decoration: const InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      prefixIcon: Icon(
-                                        Icons.email,
-                                        color: secondaryColor,
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 2, top: 10),
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: TextFormField(
+                                      controller: emailController,
+                                      keyboardType: TextInputType.emailAddress,
+                                      textInputAction: TextInputAction.next,
+                                      cursorColor: tDorkColor,
+                                      decoration: const InputDecoration(
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        prefixIcon: Icon(
+                                          Icons.email,
+                                          color: secondaryColor,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: "Email",
+                                        labelStyle: TextStyle(color: tDorkColor),
                                       ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      hintText: "Email",
-                                      labelStyle: TextStyle(color: tDorkColor),
+                                      validator: (value){
+                                        if(value!.isEmpty){
+                                          Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your email");
+                                        }
+                                        return null ;
+                                      },
                                     ),
-                                    validator: (value){
-                                      if(value!.isEmpty){
-                                        Fluttertoast.showToast(backgroundColor: Colors.purple,msg: "please provide your email");
-                                      }
-                                      return null ;
-                                    },
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2, top: 10),
-                                child: SizedBox(
-                                  height: 50,
-                                  child: TextFormField(
-                                    controller: passwordController,
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.done,
-                                    obscuringCharacter: '*',
-                                    obscureText: true,
-                                    cursorColor: tDorkColor,
-                                    decoration: const InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      prefixIcon: Icon(
-                                        Icons.lock,
-                                        color: secondaryColor,
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2, top: 10),
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: TextFormField(
+                                      controller: passwordController,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.done,
+                                      obscuringCharacter: '*',
+                                      obscureText: true,
+                                      cursorColor: tDorkColor,
+                                      decoration: const InputDecoration(
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        prefixIcon: Icon(
+                                          Icons.lock,
+                                          color: secondaryColor,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: "Password",
+                                        labelStyle: TextStyle(color: tDorkColor),
                                       ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      hintText: "Password",
-                                      labelStyle: TextStyle(color: tDorkColor),
+                                      validator: (value) {
+                                        if (value!.isEmpty && value!.length < 5) {
+                                          Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty && value!.length < 5) {
-                                        Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
-                                      }
-                                      return null;
-                                    },
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2, top: 10),
-                                child: SizedBox(
-                                  height: 50,
-                                  child: TextFormField(
-                                    controller: dobController,
-                                    keyboardType: TextInputType.text,
-                                    textInputAction: TextInputAction.done,
-                                    cursorColor: tDorkColor,
-                                    onTap: () => _selectDate(context),
-                                    decoration: const InputDecoration(
-                                      focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide.none,
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(10))),
-                                      prefixIcon: Icon(
-                                        Icons.calendar_month,
-                                        color: secondaryColor,
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 2, top: 10),
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: TextFormField(
+                                      controller: dobController,
+                                      keyboardType: TextInputType.text,
+                                      textInputAction: TextInputAction.done,
+                                      cursorColor: tDorkColor,
+                                      onTap: () => _selectDate(context),
+                                      decoration: const InputDecoration(
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius:
+                                            BorderRadius.all(Radius.circular(10))),
+                                        prefixIcon: Icon(
+                                          Icons.calendar_month,
+                                          color: secondaryColor,
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white,
+                                        hintText: "DOB",
+                                        labelStyle: TextStyle(color: tDorkColor),
                                       ),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      hintText: "DOB",
-                                      labelStyle: TextStyle(color: tDorkColor),
+                                      validator: (value) {
+                                        if (value!.isEmpty && value!.length < 5) {
+                                          Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid DOB");
+                                        }
+                                        return null;
+                                      },
                                     ),
-                                    validator: (value) {
-                                      if (value!.isEmpty && value!.length < 5) {
-                                        Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid DOB");
-                                      }
-                                      return null;
-                                    },
                                   ),
                                 ),
-                              ),
 
-                              //  Row(
-                              //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              //   children: [
-                              //     const Text('Profile Image',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w900),),
-                              //     IconButton(onPressed: openGallery,
-                              //         icon: Container(
-                              //             height:35,
-                              //             width:35,
-                              //             decoration: BoxDecoration(
-                              //               borderRadius: BorderRadius.circular(50),
-                              //               color: Colors.white
-                              //             ),
-                              //             child: const Icon(Icons.camera_alt_outlined,color: Colors.black,)),)
-                              //   ],
-                              // ),
+                                //  Row(
+                                //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                //   children: [
+                                //     const Text('Profile Image',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w900),),
+                                //     IconButton(onPressed: openGallery,
+                                //         icon: Container(
+                                //             height:35,
+                                //             width:35,
+                                //             decoration: BoxDecoration(
+                                //               borderRadius: BorderRadius.circular(50),
+                                //               color: Colors.white
+                                //             ),
+                                //             child: const Icon(Icons.camera_alt_outlined,color: Colors.black,)),)
+                                //   ],
+                                // ),
 
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  const Text('Profile Image', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-                                  IconButton(
-                                    onPressed: openGallery,
-                                    icon: Container(
-                                      height: 35,
-                                      width: 35,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(50),
-                                        color: Colors.white,
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    const Text('Profile Image', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
+                                    IconButton(
+                                      onPressed: openGallery,
+                                      icon: Container(
+                                        height: 35,
+                                        width: 35,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(50),
+                                          color: Colors.white,
+                                        ),
+                                        child: const Icon(Icons.camera_alt_outlined, color: Colors.black),
                                       ),
-                                      child: const Icon(Icons.camera_alt_outlined, color: Colors.black),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                    )
+                                  ],
+                                ),
 
 
-                            ],
-                          )),
-                      const SizedBox(
-                        height: 10,
+                              ],
+                            )),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // this is button
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0)),
+                          backgroundColor: secondaryColor,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: MediaQuery.of(context).size.width / 3.3,
+                              vertical: 10)
                       ),
+
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Validate the form
+                          if (selectedImage != null) {
+                            // Image is selected, proceed with signup
+                            signup();
+                          } else {
+                            Fluttertoast.showToast(backgroundColor: Colors.purple, msg: "Please select a profile image");
+                          }
+                        }
+                      },
+
+
+                      // onPressed: () {
+                      //   if(_formKey.currentState!.validate()){
+                      //     // validate();
+                      //     signup();
+                      //   }
+                      // },
+                      child: loading ? const CircularProgressIndicator(strokeWidth: 3,color: Colors.white,):
+                      const Text(
+                        'Sign Up',
+                        style: TextStyle(fontSize: 17,color: tDorkColor),
+                      )),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already have account?',
+                        style: TextStyle(
+                          color: Colors.black.withOpacity(0.6),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()));
+                        },
+                        child: const Text(
+                          'Log In',
+                          style: TextStyle(
+                              color: secondaryColor,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      )
                     ],
                   ),
-                ),
-                // this is button
-                const SizedBox(
-                  height: 30,
-                ),
-                ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0)),
-                        backgroundColor: secondaryColor,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: MediaQuery.of(context).size.width / 3.3,
-                            vertical: 10)
-                    ),
-
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Validate the form
-                        if (selectedImage != null) {
-                          // Image is selected, proceed with signup
-                          signup();
-                        } else {
-                          Fluttertoast.showToast(backgroundColor: Colors.purple, msg: "Please select a profile image");
-                        }
-                      }
-                    },
-
-
-                    // onPressed: () {
-                    //   if(_formKey.currentState!.validate()){
-                    //     // validate();
-                    //     signup();
-                    //   }
-                    // },
-                    child: loading ? const CircularProgressIndicator(strokeWidth: 3,color: Colors.white,):
-                    const Text(
-                      'Sign Up',
-                      style: TextStyle(fontSize: 17,color: tDorkColor),
-                    )),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already have account?',
-                      style: TextStyle(
-                        color: Colors.black.withOpacity(0.6),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
-                      },
-                      child: const Text(
-                        'Log In',
-                        style: TextStyle(
-                            color: secondaryColor,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
