@@ -1,16 +1,14 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:plannerapp/Screen/profile-screen.dart';
 import '../Aut/firebase-service.dart';
 import '../Aut/login-screen.dart';
 import '../model/task-model.dart';
 import '../utiles/utils.dart';
-
-
 
 class TaskListScreen extends StatefulWidget {
   @override
@@ -20,8 +18,12 @@ class TaskListScreen extends StatefulWidget {
 class _TaskListScreenState extends State<TaskListScreen> {
   final FirebaseService _firebaseService = FirebaseService();
   final TextEditingController _titleController = TextEditingController();
+  final searchFilterController = TextEditingController();
   DateTime _selectedDateTime = DateTime.now();
+  DateTime? pickedDate;
+  String? myTask;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> _editTaskDialog(Task task) async {
     TextEditingController _editTitleController = TextEditingController();
@@ -43,14 +45,23 @@ class _TaskListScreenState extends State<TaskListScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              TextFormField(
                 controller: _editTitleController,
                 decoration: const InputDecoration(labelText: 'Title'),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    Fluttertoast.showToast(
+                        backgroundColor: Colors.purple,
+                        msg: "please enter Task");
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 8.0),
               Row(
                 children: [
-                  Text('Date: ${DateFormat('yyyy-MM-dd').format(_editDateTime!)}'),
+                  Text(
+                      'Date: ${DateFormat('yyyy-MM-dd').format(_editDateTime!)}'),
                   IconButton(
                     icon: const Icon(Icons.calendar_today),
                     onPressed: () async {
@@ -81,7 +92,8 @@ class _TaskListScreenState extends State<TaskListScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                await _firebaseService.updateTask(task.id!, _editTitleController.text, DateTime.now());
+                await _firebaseService.updateTask(
+                    task.id!, _editTitleController.text, DateTime.now());
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('Update'),
@@ -107,13 +119,14 @@ class _TaskListScreenState extends State<TaskListScreen> {
         appBar: AppBar(
           centerTitle: true,
           title: const Text('Planner',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.redAccent,
           actions: [
             IconButton(
               onPressed: () {
                 Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) =>  ProfileScreen()));
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
               icon: const Icon(
                 Icons.person_rounded,
@@ -128,18 +141,19 @@ class _TaskListScreenState extends State<TaskListScreen> {
             onPressed: () {
               showDialog(
                   context: context,
-                  builder: (BuildContext context){
+                  builder: (BuildContext context) {
                     return AlertDialog(
-                      title: const Text ('Do you want to SignOut?'),
+                      title: const Text('Do you want to SignOut?'),
                       actions: [
                         TextButton(
-                          child :const Text('Yes'),
+                          child: const Text('Yes'),
                           onPressed: () {
                             _auth.signOut().then((value) {
                               Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const LoginScreen()));
+                                      builder: (context) =>
+                                          const LoginScreen()));
                             }).onError((error, stackTrace) {
                               Utils().toastMessage(error.toString());
                             });
@@ -149,106 +163,90 @@ class _TaskListScreenState extends State<TaskListScreen> {
                               backgroundColor: Colors.green,
                               textStyle: const TextStyle(
                                 fontSize: 14,
-                              )
-                          ),
+                              )),
                         ),
                         TextButton(
-                          child :const Text('No'),
+                          child: const Text('No'),
                           onPressed: () => Navigator.pop(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>  TaskListScreen())),
+                                  builder: (context) => TaskListScreen())),
                           style: TextButton.styleFrom(
                               primary: Colors.white,
-                              backgroundColor:Colors.green,
+                              backgroundColor: Colors.green,
                               textStyle: const TextStyle(
-                                fontSize:14,
-                              )
-                          ),
+                                fontSize: 14,
+                              )),
                         ),
                       ],
                     );
-                  }
-              );
+                  });
             },
-            icon: const Icon(Icons.logout,color: Colors.white,),
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
           ),
         ),
         body: Column(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter task title...',
-                      ),
-                    ),
+              child: TextFormField(
+                controller: searchFilterController,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(vertical: 5.0),
+                  hintText: 'Search',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.teal,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDateTime,
-                        firstDate: DateTime(2010),
-                        lastDate: DateTime(2101),
-                      );
-
-                      if (pickedDate != null && pickedDate != _selectedDateTime) {
-                        setState(() {
-                          _selectedDateTime = pickedDate;
-                        });
-                      }
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_titleController.text.isNotEmpty) {
-                        await _firebaseService.addTask(_titleController.text, DateTime.now());
-                        _titleController.clear();
-                      }
-                    },
-                    child: const Text('Add Task'),
-                  ),
-                ],
+                ),
+                onChanged: (String value) {
+                  setState(() {});
+                },
               ),
             ),
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firebaseService.getTasks(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('Error: ${snapshot.error}'),
-                    );
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+                child: StreamBuilder<QuerySnapshot>(
+              stream: _firebaseService.getTasksByUser(_auth.currentUser?.uid),
+              // stream: _firebaseService.getTasks(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                  List<Task> tasks = snapshot.data!.docs.map((doc) {
-                    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-                    return Task.fromMap(data, doc.id);
-                  }).toList();
 
-                  return ListView.builder(
-                    itemCount: tasks.length,
-                    itemBuilder: (context, index) {
-                      Task task = tasks[index];
+                List<Task> tasks = snapshot.data!.docs.map((doc) {
+                  Map<String, dynamic> data =
+                      doc.data() as Map<String, dynamic>;
+                  return Task.fromMap(data, doc.id);
+                }).toList();
+
+                return ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  itemBuilder: (context, index) {
+                    myTask =
+                        snapshot.data!.docs[index]['title'].toString();
+                    print('hello $myTask');
+                    Task task = tasks[index];
+                    if(searchFilterController.text.isEmpty){
                       return ListTile(
                         title: Text(task.title ?? 'No Title'),
                         subtitle: Text(
                           task.dateTime != null
-                              ? DateFormat('yyyy-MM-dd hh:mm a').format(task.dateTime!.toLocal())
+                              ? DateFormat('yyyy-MM-dd hh:mm a')
+                              .format(task.dateTime!.toLocal())
                               : 'No Date',
                         ),
-
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -267,17 +265,125 @@ class _TaskListScreenState extends State<TaskListScreen> {
                           ],
                         ),
                       );
-                    },
-                  );
-                },
-              )
+                    } else if(myTask!.toLowerCase().contains(searchFilterController.text.toLowerCase())){
+                      return ListTile(
+                        title: Text(task.title ?? 'No Title'),
+                        subtitle: Text(
+                          task.dateTime != null
+                              ? DateFormat('yyyy-MM-dd hh:mm a')
+                              .format(task.dateTime!.toLocal())
+                              : 'No Date',
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () async {
+                                await _editTaskDialog(task);
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete),
+                              onPressed: () async {
+                                await _deleteTask(task.id!);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }return Container();
+
+                  },
+                );
 
 
-            ),
+
+              },
+            )),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Add Task'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(labelText: 'Title'),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            Fluttertoast.showToast(
+                                backgroundColor: Colors.purple,
+                                msg: "please enter Task");
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 8.0),
+                      Form(
+                        key: _formKey,
+                        child: Row(
+                          children: [
+                            Text(
+                                'Date: ${DateFormat('yyyy-MM-dd').format(_selectedDateTime)}'),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_today),
+                              onPressed: () async {
+                                DateTime? pickedDate = await showDatePicker(
+                                  context: context,
+                                  initialDate: _selectedDateTime,
+                                  firstDate: DateTime(2010),
+                                  lastDate: DateTime(2101),
+                                );
+
+                                if (pickedDate != null &&
+                                    pickedDate != _selectedDateTime) {
+                                  setState(() {
+                                    _selectedDateTime = pickedDate;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            if (_selectedDateTime != null) {
+                              await _firebaseService.addTask(
+                                  _titleController.text,
+                                  DateTime.now(),
+                                  _auth.currentUser?.uid);
+                              _titleController.clear();
+                              Fluttertoast.showToast(
+                                  backgroundColor: Colors.purple,
+                                  msg: "Task added successfully");
+                              Navigator.of(context).pop();
+                            } else {
+                              Fluttertoast.showToast(
+                                  backgroundColor: Colors.purple,
+                                  msg: "Please pick a date");
+                            }
+                          }
+                        },
+                        child: const Text('Add Task'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          child: const Icon(Icons.add),
         ),
       ),
     );
   }
 }
-

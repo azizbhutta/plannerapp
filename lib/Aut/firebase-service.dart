@@ -8,11 +8,12 @@ class FirebaseService {
   FirebaseFirestore.instance.collection('tasks');
 
 
-  Future<void> addTask(String title, DateTime dateTime) async {
+  Future<void> addTask(String title, DateTime dateTime, String? userId) async {
     String taskId = _firebaseService.tasksCollection.doc().id; // Generate a new ID
     await _firebaseService.tasksCollection.doc(taskId).set({
       'title': title,
       'dateTime': dateTime,
+      'userId': userId,
     });
   }
 
@@ -40,5 +41,13 @@ class FirebaseService {
 
   Stream<QuerySnapshot> getTasks() {
     return tasksCollection.snapshots();
+  }
+
+
+  Stream<QuerySnapshot> getTasksByUser(String? userId) {
+    return FirebaseFirestore.instance
+        .collection('tasks')
+        .where('userId', isEqualTo: userId)
+        .snapshots();
   }
 }

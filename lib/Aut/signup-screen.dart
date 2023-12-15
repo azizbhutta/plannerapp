@@ -23,6 +23,170 @@ class SignupScreen extends StatefulWidget {
 class _SignupScreenState extends State<SignupScreen> {
 
 
+//   File? selectedImage; // Track the selected image file
+//   DateTime? selectedDate;
+//
+//   bool loading = false;
+//   final _formKey = GlobalKey<FormState>();
+//   TextEditingController nameController = TextEditingController();
+//   TextEditingController emailController = TextEditingController();
+//   TextEditingController passwordController = TextEditingController();
+//   TextEditingController dobController = TextEditingController();
+//
+//   FirebaseAuth _auth = FirebaseAuth.instance;
+//
+//
+//   // TODO: Add Firestore instance
+//   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+//
+//
+//   @override
+//   void dispose() {
+//     nameController.clear();
+//     emailController.clear();
+//     passwordController.clear();
+//     dobController.clear();
+//     super.dispose();
+//   }
+//
+//
+//   void validate() {
+//     if (_formKey.currentState!.validate()) {
+//       // If the form is valid, proceed with navigation
+//       Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (context) => const LoginScreen()));
+//     } else {
+//       // If the form is not valid, show error messages or toasts
+//       return;
+//     }
+//   }
+//
+//
+//   // TODO: Add a function to show date picker
+//   // Future<void> _selectDate(BuildContext context) async {
+//   //   final DateTime? picked = await showDatePicker(
+//   //     context: context,
+//   //     initialDate: DateTime.now(),
+//   //     firstDate: DateTime(1900),
+//   //     lastDate: DateTime.now(),
+//   //   );
+//   //
+//   //   if (picked != null && picked != selectedDate) {
+//   //     setState(() {
+//   //       selectedDate = picked;
+//   //       dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+//   //     });
+//   //   }
+//   // }
+//
+//
+// // TODO: signup method to store DatA in Firestore
+//
+//
+//   Future<void> _selectDate(BuildContext context) async {
+//     final DateTime? picked = await showDatePicker(
+//       context: context,
+//       initialDate: DateTime.now(),
+//       firstDate: DateTime(1900),
+//       lastDate: DateTime.now(),
+//     );
+//
+//     if (picked != null && picked != selectedDate) {
+//       DateTime currentDate = DateTime.now();
+//       DateTime minimumDate = currentDate.subtract(const Duration(days: 14 * 365));
+//
+//       if (picked.isBefore(minimumDate)) {
+//         Fluttertoast.showToast(
+//           backgroundColor: Colors.purple,
+//           msg: "You must be at least 14 years old to sign up.",
+//         );
+//       } else {
+//         setState(() {
+//           selectedDate = picked;
+//           dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+//         });
+//       }
+//     }
+//   }
+//
+//
+//
+//   Future<void> signup() async {
+//     setState(() {
+//       loading = true;
+//     });
+//
+//     try {
+//       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+//         email: emailController.text.toString(),
+//         password: passwordController.text.toString(),
+//       );
+//
+//       // Upload profile image to Firebase Storage
+//       String userId = userCredential.user!.uid;
+//       Reference storageReference = FirebaseStorage.instance.ref().child('profile_images/$userId.jpg');
+//       UploadTask uploadTask = storageReference.putFile(selectedImage!);
+//       await uploadTask.whenComplete(() async {
+//         // Get the download URL of the uploaded image
+//         String imageUrl = await storageReference.getDownloadURL();
+//
+//         // Store user information in Cloud Firestore
+//         await _firestore.collection('users').doc(userId).set({
+//           'name': nameController.text,
+//           'email': emailController.text,
+//           'dob': dobController.text,
+//           'profileImageUrl': imageUrl,
+//         });
+//
+//         // Update user profile with image URL
+//         await userCredential.user!.updateProfile(displayName: nameController.text, photoURL: imageUrl);
+//
+//         setState(() {
+//           loading = false;
+//         });
+//
+//         Fluttertoast.showToast(
+//           gravity: ToastGravity.BOTTOM,
+//           backgroundColor: Colors.green,
+//           msg: "Signup complete",
+//         );
+//
+//         // Navigate to login screen only if user creation is successful
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) => const LoginScreen(),
+//           ),
+//         );
+//       });
+//     } catch (error) {
+//       setState(() {
+//         loading = false;
+//       });
+//
+//       Fluttertoast.showToast(
+//         gravity: ToastGravity.BOTTOM,
+//         backgroundColor: Colors.purple,
+//         msg: error.toString(),
+//       );
+//     }
+//   }
+//
+//   // TODO: Pick Image
+//   Future<void> openGallery() async {
+//     final picker = ImagePicker();
+//     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+//
+//     if (pickedFile != null) {
+//       setState(() {
+//         selectedImage = File(pickedFile.path);
+//       });
+//     }
+//   }
+//
+
+
   File? selectedImage; // Track the selected image file
   DateTime? selectedDate;
 
@@ -35,10 +199,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-
   // TODO: Add Firestore instance
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
 
   @override
   void dispose() {
@@ -48,20 +210,6 @@ class _SignupScreenState extends State<SignupScreen> {
     dobController.clear();
     super.dispose();
   }
-
-
-  void validate() {
-    if (_formKey.currentState!.validate()) {
-      // If the form is valid, proceed with navigation
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()));
-    } else {
-      // If the form is not valid, show error messages or toasts
-      return;
-    }
-  }
-
 
   // TODO: Add a function to show date picker
   Future<void> _selectDate(BuildContext context) async {
@@ -73,15 +221,24 @@ class _SignupScreenState extends State<SignupScreen> {
     );
 
     if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
-      });
+      DateTime currentDate = DateTime.now();
+      DateTime minimumBirthDate = currentDate.subtract(const Duration(days: 14 * 365));
+
+      if (picked.isAfter(minimumBirthDate)) {
+        Fluttertoast.showToast(
+          backgroundColor: Colors.purple,
+          msg: "You must be at least 14 years old to sign up.",
+        );
+      } else {
+        setState(() {
+          selectedDate = picked;
+          dobController.text = DateFormat('yyyy-MM-dd').format(selectedDate!);
+        });
+      }
     }
   }
 
-
-// TODO: signup method to store DatA in Firestore
+  // TODO: signup method to store Data in Firestore
   Future<void> signup() async {
     setState(() {
       loading = true;
@@ -93,9 +250,31 @@ class _SignupScreenState extends State<SignupScreen> {
         password: passwordController.text.toString(),
       );
 
+      // Calculate age based on selected date of birth
+      DateTime currentDate = DateTime.now();
+      DateTime minimumBirthDate = currentDate.subtract(const Duration(days: 14 * 365));
+
+      if (selectedDate != null && selectedDate!.isAfter(minimumBirthDate)) {
+        setState(() {
+          loading = false;
+        });
+
+        Fluttertoast.showToast(
+          gravity: ToastGravity.BOTTOM,
+          backgroundColor: Colors.purple,
+          msg: "You must be at least 14 years old to sign up.",
+        );
+
+        // Delete the created user as they don't meet the age requirement
+        await userCredential.user!.delete();
+
+        return;
+      }
+
       // Upload profile image to Firebase Storage
       String userId = userCredential.user!.uid;
-      Reference storageReference = FirebaseStorage.instance.ref().child('profile_images/$userId.jpg');
+      Reference storageReference =
+      FirebaseStorage.instance.ref().child('profile_images/$userId.jpg');
       UploadTask uploadTask = storageReference.putFile(selectedImage!);
       await uploadTask.whenComplete(() async {
         // Get the download URL of the uploaded image
@@ -110,7 +289,8 @@ class _SignupScreenState extends State<SignupScreen> {
         });
 
         // Update user profile with image URL
-        await userCredential.user!.updateProfile(displayName: nameController.text, photoURL: imageUrl);
+        await userCredential.user!.updateProfile(
+            displayName: nameController.text, photoURL: imageUrl);
 
         setState(() {
           loading = false;
@@ -154,7 +334,6 @@ class _SignupScreenState extends State<SignupScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
