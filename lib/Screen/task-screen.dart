@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:plannerapp/Screen/profile-screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Aut/firebase-service.dart';
 import '../Aut/login-screen.dart';
 import '../model/task-model.dart';
@@ -71,7 +72,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         firstDate: DateTime(2010),
                         lastDate: DateTime(2101),
                       );
-
                       if (pickedDate != null && pickedDate != _editDateTime) {
                         setState(() {
                           _editDateTime = pickedDate;
@@ -108,12 +108,20 @@ class _TaskListScreenState extends State<TaskListScreen> {
     await _firebaseService.deleteTask(taskId);
   }
 
+  void clearLoginStatus() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("loggedIn");
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
         // Always return false to prevent going back
-        return Future.value(false);
+        SystemNavigator.pop();
+        // Return true to allow the pop, or false to prevent it.
+        return false;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -149,11 +157,16 @@ class _TaskListScreenState extends State<TaskListScreen> {
                           child: const Text('Yes'),
                           onPressed: () {
                             _auth.signOut().then((value) {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const LoginScreen()));
+                              // Clear login status in shared preferences
+                              clearLoginStatus();
+                              // Navigate to the login screen
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginScreen(),
+                                ),
+                                    (route) => false, // Remove all existing routes from the stack
+                              );
                             }).onError((error, stackTrace) {
                               Utils().toastMessage(error.toString());
                             });

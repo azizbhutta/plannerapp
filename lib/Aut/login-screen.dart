@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:plannerapp/Aut/signup-screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Screen/task-screen.dart';
 import '../constants/colors.dart';
 import '../constants/image-strings.dart';
@@ -26,6 +27,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   FirebaseAuth auth = FirebaseAuth.instance;
+  bool isPasswordVisible = false;
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
+
+  void checkLoginStatus() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool loggedIn = preferences.getBool("loggedIn") ?? false;
+
+    if (loggedIn) {
+      // If the user is already logged in, navigate to the task screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TaskListScreen()),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -33,6 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     passwordController.clear();
     super.dispose();
   }
+
 
   void login() {
     setState(() {
@@ -43,38 +67,51 @@ class _LoginScreenState extends State<LoginScreen> {
         email: emailController.text,
         password: passwordController.text.toString())
         .then((value) {
-      Fluttertoast.showToast( gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg: value.user!.email.toString());
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>  TaskListScreen()));
+      // Save login state in shared preferences
+      saveLoginStatus();
+
+      Fluttertoast.showToast(
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.purple,
+        msg: value.user!.email.toString(),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TaskListScreen()),
+      );
+
       setState(() {
         loading = false;
       });
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
-      Fluttertoast.showToast(gravity: ToastGravity.BOTTOM, backgroundColor: Colors.purple,msg:error.toString());
+      Fluttertoast.showToast(
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.purple,
+        msg: error.toString(),
+      );
       setState(() {
         loading = false;
       });
     });
   }
 
-  var presscount = 0;
+  void saveLoginStatus() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool("loggedIn", true);
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
     onWillPop: () async {
-      presscount++;
-      if (presscount == 2) {
-        exit(0);
-      } else {
-        var snackBar =
-        SnackBar(content: Text('press another time to exit from app'));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        return false;
-      }
+      SystemNavigator.pop();
+      // Return true to allow the pop, or false to prevent it.
+      return false;
+
     },
       child: Scaffold(
         body: Container(
@@ -111,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             fontSize: 15),
                       ),
                     ),
-      
+
                     const SizedBox(
                       height: 30,
                     ),
@@ -173,30 +210,45 @@ class _LoginScreenState extends State<LoginScreen> {
                                         controller: passwordController,
                                         keyboardType: TextInputType.text,
                                         textInputAction: TextInputAction.done,
-                                        obscuringCharacter: '*',
-                                        obscureText: true,
-                                        cursorColor: tDorkColor,
-                                        decoration: const InputDecoration(
-                                          focusedBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(10))),
-                                          enabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide.none,
-                                              borderRadius:
-                                              BorderRadius.all(Radius.circular(10))),
-                                          prefixIcon: Icon(
+                                        obscureText: !isPasswordVisible,
+                                        cursorColor: Colors.blue, // Change to your preferred color
+                                        decoration: InputDecoration(
+                                          focusedBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          ),
+                                          enabledBorder: const UnderlineInputBorder(
+                                            borderSide: BorderSide.none,
+                                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                                          ),
+                                          prefixIcon: const Icon(
                                             Icons.lock,
-                                            color: secondaryColor,
+                                            color: secondaryColor, // Change to your preferred color
+                                          ),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isPasswordVisible = !isPasswordVisible;
+                                              });
+                                            },
+                                            icon: Icon(
+                                              isPasswordVisible
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                              color: secondaryColor, // Change to your preferred color
+                                            ),
                                           ),
                                           filled: true,
                                           fillColor: Colors.white,
                                           hintText: "Password",
-                                          labelStyle: TextStyle(color: tDorkColor),
+                                          labelStyle: TextStyle(color: tDorkColor), // Change to your preferred color
                                         ),
                                         validator: (value) {
-                                          if (value!.isEmpty && value!.length < 5) {
-                                            Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
+                                          if (value!.isEmpty || value.length < 5) {
+                                            Fluttertoast.showToast(
+                                              backgroundColor: Colors.purple,
+                                              msg: "Enter a valid password",
+                                            );
                                           }
                                           return null;
                                         },
@@ -206,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                               )
                           ),
-      
+
                           const SizedBox(
                             height: 20,
                           ),

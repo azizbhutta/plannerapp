@@ -198,6 +198,7 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController dobController = TextEditingController();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+  bool isPasswordVisible = false;
 
   // TODO: Add Firestore instance
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -216,7 +217,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
+      firstDate: DateTime(1950),
       lastDate: DateTime.now(),
     );
 
@@ -323,7 +324,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
-  // TODO: Pick Image
+
   Future<void> openGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -335,14 +336,21 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () async {
-          // Always return false to prevent going back
-          return Future.value(false);
+          // Handle the back button press here
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+          // Return true to allow the pop, or false to prevent it.
+          return false;
         },
       child: Scaffold(
+
         body: Container(
           color: primaryColor,
           child: Center(
@@ -381,7 +389,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     height: 30,
                   ),
                   Container(
-                    height: 320,
+                    height: 330,
                     width: MediaQuery.of(context).size.width / 1.1,
                     decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.3),
@@ -474,34 +482,50 @@ class _SignupScreenState extends State<SignupScreen> {
                                       controller: passwordController,
                                       keyboardType: TextInputType.text,
                                       textInputAction: TextInputAction.done,
-                                      obscuringCharacter: '*',
-                                      obscureText: true,
-                                      cursorColor: tDorkColor,
-                                      decoration: const InputDecoration(
-                                        focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius:
-                                            BorderRadius.all(Radius.circular(10))),
-                                        enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius:
-                                            BorderRadius.all(Radius.circular(10))),
-                                        prefixIcon: Icon(
+                                      obscureText: !isPasswordVisible,
+                                      cursorColor: Colors.blue, // Change to your preferred color
+                                      decoration: InputDecoration(
+                                        focusedBorder: const UnderlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        ),
+                                        enabledBorder: const UnderlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                                        ),
+                                        prefixIcon: const Icon(
                                           Icons.lock,
-                                          color: secondaryColor,
+                                          color: secondaryColor, // Change to your preferred color
+                                        ),
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isPasswordVisible = !isPasswordVisible;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            isPasswordVisible
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: secondaryColor, // Change to your preferred color
+                                          ),
                                         ),
                                         filled: true,
                                         fillColor: Colors.white,
                                         hintText: "Password",
-                                        labelStyle: TextStyle(color: tDorkColor),
+                                        labelStyle: TextStyle(color: tDorkColor), // Change to your preferred color
                                       ),
                                       validator: (value) {
-                                        if (value!.isEmpty && value!.length < 5) {
-                                          Fluttertoast.showToast( backgroundColor: Colors.purple,msg: "Enter a valid password");
+                                        if (value!.isEmpty || value.length < 5) {
+                                          Fluttertoast.showToast(
+                                            backgroundColor: Colors.purple,
+                                            msg: "Enter a valid password",
+                                          );
                                         }
                                         return null;
                                       },
                                     ),
+
                                   ),
                                 ),
                                 Padding(
@@ -541,39 +565,42 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ),
                                   ),
                                 ),
-
-                                //  Row(
-                                //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                //   children: [
-                                //     const Text('Profile Image',style: TextStyle(fontSize: 14,fontWeight: FontWeight.w900),),
-                                //     IconButton(onPressed: openGallery,
-                                //         icon: Container(
-                                //             height:35,
-                                //             width:35,
-                                //             decoration: BoxDecoration(
-                                //               borderRadius: BorderRadius.circular(50),
-                                //               color: Colors.white
-                                //             ),
-                                //             child: const Icon(Icons.camera_alt_outlined,color: Colors.black,)),)
-                                //   ],
-                                // ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
 
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     const Text('Profile Image', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900)),
-                                    IconButton(
-                                      onPressed: openGallery,
-                                      icon: Container(
-                                        height: 35,
-                                        width: 35,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(50),
-                                          color: Colors.white,
+                                    const SizedBox(
+                                      width: 140,
+                                    ),
+                                    Stack(
+                                      children: [
+                                        InkWell(
+                                          onTap: openGallery,
+                                          child: Container(
+                                            height: 50,
+                                            width: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(50),
+                                              color: secondaryColor,
+                                            ),
+                                            child: const Icon(Icons.camera_alt_outlined, color: Colors.black),
+                                          ),
                                         ),
-                                        child: const Icon(Icons.camera_alt_outlined, color: Colors.black),
-                                      ),
-                                    )
+                                        if (selectedImage != null)
+                                          Positioned.fill(
+                                            child: ClipOval(
+                                              child: Image.file(
+                                                selectedImage!,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                                   ],
                                 ),
 
@@ -599,7 +626,6 @@ class _SignupScreenState extends State<SignupScreen> {
                               horizontal: MediaQuery.of(context).size.width / 3.3,
                               vertical: 10)
                       ),
-
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           // Validate the form
@@ -612,13 +638,6 @@ class _SignupScreenState extends State<SignupScreen> {
                         }
                       },
 
-
-                      // onPressed: () {
-                      //   if(_formKey.currentState!.validate()){
-                      //     // validate();
-                      //     signup();
-                      //   }
-                      // },
                       child: loading ? const CircularProgressIndicator(strokeWidth: 3,color: Colors.white,):
                       const Text(
                         'Sign Up',
