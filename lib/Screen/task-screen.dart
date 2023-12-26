@@ -306,11 +306,8 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         ),
                       );
                     }return Container();
-
                   },
                 );
-
-
 
               },
             )),
@@ -370,15 +367,23 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             if (_selectedDateTime != null) {
-                              await _firebaseService.addTask(
-                                  _titleController.text,
-                                  DateTime.now(),
-                                  _auth.currentUser?.uid);
-                              _titleController.clear();
-                              Fluttertoast.showToast(
-                                  backgroundColor: Colors.purple,
-                                  msg: "Task added successfully");
-                              Navigator.of(context).pop();
+                              if (_titleController.text.isNotEmpty) {
+                                // The task title is not empty, proceed to add the task
+                                await _firebaseService.addTask(
+                                    _titleController.text,
+                                    DateTime.now(),
+                                    _auth.currentUser?.uid);
+                                _titleController.clear();
+                                Fluttertoast.showToast(
+                                    backgroundColor: Colors.purple,
+                                    msg: "Task added successfully");
+                                Navigator.of(context).pop();
+                              } else {
+                                // The task title is empty, show a message
+                                Fluttertoast.showToast(
+                                    backgroundColor: Colors.purple,
+                                    msg: "Please enter a task title");
+                              }
                             } else {
                               Fluttertoast.showToast(
                                   backgroundColor: Colors.purple,
@@ -388,6 +393,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
                         },
                         child: const Text('Add Task'),
                       ),
+
                     ],
                   ),
                 );

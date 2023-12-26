@@ -1462,3 +1462,212 @@
 // // ),
 
 
+// import 'package:flutter/material.dart';
+//
+// class OtpScreen extends StatefulWidget {
+//   const OtpScreen({super.key});
+//
+//   @override
+//   State<OtpScreen> createState() => _OtpScreenState();
+// }
+//
+// class _OtpScreenState extends State<OtpScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return  Scaffold(
+//       appBar: AppBar(
+//         leading: const Icon(Icons.arrow_back,color: Colors.black,),
+//       ),
+//       body:  Padding(
+//         padding: const EdgeInsets.only(left: 20,right: 20,top: 20),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             const Text('Verification',style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+//             const SizedBox(
+//               height: 20,
+//             ),
+//             const Text('Please enter the 4 digit OTP code that has been\nsent to 79******01',style: TextStyle(fontSize: 14,fontWeight:FontWeight.w500,color: Color(0xff1A1F1F)),),
+//             const SizedBox(
+//                   height: 30,
+//                 ),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                   children: [
+//                     Container(
+//                       height: 50,
+//                       width: 50,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(8),
+//                         color: Colors.white,
+//                         border: Border.all(
+//                           color: const Color(0xff10A173),  // Set your desired border color here
+//                           width: 1,             // Set the border width
+//                         ),
+//                       ),
+//                       child: TextFormField(
+//                         textInputAction: TextInputAction.next,
+//                         keyboardType: TextInputType.number,
+//                         textAlign: TextAlign.center,
+//                         maxLength: 1,
+//                         cursorColor: Color(0xff10A173),
+//                         decoration: const InputDecoration(
+//                           counterText: '',
+//                           enabledBorder: InputBorder.none,
+//                           focusedBorder: OutlineInputBorder(
+//                             borderSide: BorderSide(
+//                               color: Color(0xff10A173),  // Set your focused border color here
+//                               width: 2,                   // Set the focused border width
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     Container(
+//                       height: 50,
+//                       width: 50,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(8),
+//                         color: Colors.white,
+//                         border: Border.all(
+//                           color: const Color(0xff10A173),  // Set your desired border color here
+//                           width: 1,             // Set the border width
+//                         ),
+//                       ),
+//                       child: TextFormField(
+//                         textInputAction: TextInputAction.next,
+//                         keyboardType: TextInputType.number,
+//                         textAlign: TextAlign.center,
+//                         maxLength: 1,
+//                         cursorColor: Color(0xff10A173),
+//                         decoration: const InputDecoration(
+//                           counterText: '',
+//                           enabledBorder: InputBorder.none,
+//                           focusedBorder: OutlineInputBorder(
+//                             borderSide: BorderSide(
+//                               color: Color(0xff10A173),  // Set your focused border color here
+//                               width: 2,                   // Set the focused border width
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     Container(
+//                       height: 50,
+//                       width: 50,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(8),
+//                         color: Colors.white,
+//                         border: Border.all(
+//                           color: const Color(0xff10A173),  // Set your desired border color here
+//                           width: 1,             // Set the border width
+//                         ),
+//                       ),
+//                       child: TextFormField(
+//                         textInputAction: TextInputAction.next,
+//                         keyboardType: TextInputType.number,
+//                         textAlign: TextAlign.center,
+//                         maxLength: 1,
+//                         cursorColor: Color(0xff10A173),
+//                         decoration: const InputDecoration(
+//                           counterText: '',
+//                           enabledBorder: InputBorder.none,
+//                           focusedBorder: OutlineInputBorder(
+//                             borderSide: BorderSide(
+//                               color: Color(0xff10A173),  // Set your focused border color here
+//                               width: 2,                   // Set the focused border width
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                     Container(
+//                       height: 50,
+//                       width: 50,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(8),
+//                         color: Colors.white,
+//                         border: Border.all(
+//                           color: const Color(0xff10A173),  // Set your desired border color here
+//                           width: 1,             // Set the border width
+//                         ),
+//                       ),
+//                       child: TextFormField(
+//                         textInputAction: TextInputAction.next,
+//                         keyboardType: TextInputType.number,
+//                         textAlign: TextAlign.center,
+//                         maxLength: 1,
+//                         cursorColor: Color(0xff10A173),
+//                         decoration: const InputDecoration(
+//                           counterText: '',
+//                           enabledBorder: InputBorder.none,
+//                           focusedBorder: OutlineInputBorder(
+//                             borderSide: BorderSide(
+//                               color: Color(0xff10A173),  // Set your focused border color here
+//                               width: 2,                   // Set the focused border width
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//             const SizedBox(
+//               height: 30,
+//             ),
+//             Center(
+//               child: ElevatedButton(
+//                   style: ElevatedButton.styleFrom(
+//                       shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(10.0)),
+//                       backgroundColor: const Color(0xff10A173),
+//                       padding: EdgeInsets.symmetric(
+//                           horizontal: MediaQuery.of(context).size.width / 3.3,
+//                           vertical: 10)
+//                   ),
+//                   onPressed: () {
+//                   },
+//                   child: const Text(
+//                       'Submit',
+//                       style: TextStyle(fontSize: 14,color: Colors.white,fontWeight: FontWeight.w400),
+//                   )),
+//             ),
+//             const SizedBox(
+//               height: 30,
+//             ),
+//             const Center(
+//               child: Text(
+//                 'Didn\'t receive any code?',
+//                 style: TextStyle(
+//                   fontSize: 14,
+//                   color: Color(0xff696969),
+//                   fontWeight: FontWeight.w400
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(
+//               height: 20,
+//             ),
+//             Center(
+//               child: TextButton(
+//                 onPressed: () {
+//                 },
+//                 child: const Text(
+//                   'Resend Code',
+//                   style: TextStyle(
+//                     fontSize: 14,
+//                       color: Color(0xff10A173),
+//                       fontWeight: FontWeight.w500),
+//                 ),
+//               ),
+//             )
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
